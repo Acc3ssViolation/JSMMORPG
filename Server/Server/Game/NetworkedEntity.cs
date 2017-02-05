@@ -7,11 +7,32 @@ using System.Reflection;
 
 namespace Server.Game
 {
+    public enum Mode
+    {
+        Level,
+        Global
+    }
+
     public class NetworkedEntity
     {
         private Dictionary<string, dynamic> m_syncedValues;
 
+        /// <summary>
+        /// The mode of this entity (in a level or global)
+        /// </summary>
+        public Mode mode = Mode.Level;
+        /// <summary>
+        /// The level index this entity is in.
+        /// </summary>
+        public SyncedValue<int> level = new SyncedValue<int>();
+
+        /// <summary>
+        /// Id used for identification. Same on server and clients.
+        /// </summary>
         public int id;
+        /// <summary>
+        /// If the start method has been called yet.
+        /// </summary>
         public bool started;
 
         public NetworkedEntity()

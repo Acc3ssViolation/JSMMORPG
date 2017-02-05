@@ -26,10 +26,14 @@ namespace Server
 
         bool m_keepRunning;
 
+        public static Config config { get; set; }
+
         public void Start()
         {
             m_keepRunning = true;
             m_config = new Config();
+
+            config = m_config;
 
             Output.WriteLine("Starting server " + m_config.Name);
 
@@ -50,7 +54,7 @@ namespace Server
 
             Output.WriteLine("Startup completed!");
 
-
+            Time.interval = 100;
             using(Timer gameTimer = new Timer((s) =>
             {
                 lock(GameController.instance)
@@ -59,7 +63,7 @@ namespace Server
                     controller.SendMessage();
                     controller.DebugOutput();
                 }
-            }, null, 0, 100))
+            }, null, 0, Time.interval))
             {
                 //TESt
                 Player p = new Player();

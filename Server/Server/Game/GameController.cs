@@ -52,8 +52,18 @@ namespace Server.Game
 
             m_spawnPoints = new List<Vector2>();
             m_spawnPoints.Add(new Vector2(10, 10));
+
+            // TEST
+            var train = SpawnNetworked<Train>();
+            train.serverPos.value = new Vector2(-60, 5.5f);
+            train = SpawnNetworked<Train>();
+            train.serverPos.value = new Vector2(120, 5.5f);
         }
 
+        /// <summary>
+        /// Connects a client and creates their player object.
+        /// </summary>
+        /// <param name="newClient"></param>
         public void ConnectClient(Client newClient)
         {
             if(m_players.ContainsKey(newClient))
@@ -70,7 +80,11 @@ namespace Server.Game
 
             // Send spawn message
             GamePlayerSpawnedMessage playerMessage = new GamePlayerSpawnedMessage();
+
             playerMessage.playerEntityId = newPlayer.id;
+            playerMessage.serverName = Server.config.Name;
+            playerMessage.serverMessage = Server.config.Message;
+
             var frame = new Frame();
             frame.SetPayload(JsonConvert.SerializeObject(playerMessage, Formatting.None));
             frame.Write(newClient.m_tcpClient.GetStream());
@@ -97,6 +111,10 @@ namespace Server.Game
             Output.WriteLine("GC: Connected client " + newClient.m_name);
         }
 
+        /// <summary>
+        /// Disconnects the client and removes their player object.
+        /// </summary>
+        /// <param name="client"></param>
         public void DisconnectClient(Client client)
         {
             Player player;
@@ -107,6 +125,11 @@ namespace Server.Game
             }            
         }
 
+        /// <summary>
+        /// Spawns a NetworkedEntity of type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public T SpawnNetworked<T>() where T : NetworkedEntity, new()
         {
             var id = random.Next();
@@ -173,6 +196,7 @@ namespace Server.Game
                 if(!entity.Value.started)
                 {
                     entity.Value.Start();
+                    entity.Value.started = true;
                 }
                 entity.Value.Update();
             }
@@ -231,6 +255,11 @@ namespace Server.Game
             foreach(var player in m_players)
             {
                 Output.WriteLine(player.Value.owner.m_name + " - at pos: " + player.Value.serverPos.value.ToString());
+            }
+            Output.WriteLine("Entity count: " + m_entities.Count);
+            foreach(var entity in m_entities)
+            {
+                Output.WriteLine(entity.Value.ToString());
             }
         }
     }

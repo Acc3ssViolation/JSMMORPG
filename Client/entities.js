@@ -12,6 +12,7 @@ function Player(x, y)
 	// generic network things
 	this.netId = 0;
 	this.ownedByPlayer = false;
+	this.level = 0;
 	
 	// player specific network things
 	this.serverPos = tileToWorld(x, y);
@@ -175,7 +176,10 @@ Player.prototype.getNetworkMessage = function ()
 		Key: "serverTargetTile",
 		Value: this.targetTile
 	});
-	
+	values.push({
+		Key: "level",
+		Value: this.level
+	});	
 	
 	var msg = {
 		entityId: writeNetId(this.netId),
@@ -202,6 +206,8 @@ Player.prototype.teleport = function(newWorldPos)
 	//Reset walking animtion
 	this.moveAnimState = 0;
 	this.moveAnimTimer = 99;
+	
+	this.level = currentLevelIndex;
 };
 
 
@@ -211,6 +217,16 @@ var spriteTrain = new Sprite('train_64.png', 44.296875, 3.5, new Vector2(-22.148
 
 function Train(x, y, vx, vy)
 {
+	// generic network things
+	this.netId = 0;
+	this.ownedByPlayer = false;
+	this.level = 0;
+	
+	// train server vars
+	this.serverPos = tileToWorld(x, y);
+	this.serverVel = new Vector2(vx, vy);
+	
+	//
 	this.pos = tileToWorld(x, y);
 	this.vel = new Vector2(vx, vy);
 	this.visible = true;
@@ -224,11 +240,25 @@ function Train(x, y, vx, vy)
 
 Train.prototype.update = function(deltaTime)
 {
-	this.vel.x = -10;
-
+	//this.vel.x = -10;
 	this.pos = v2Add(this.pos, v2Multiply(this.vel, deltaTime));
-	if(this.pos.x < -60){
+	/*if(this.pos.x < -60){
 		this.pos.x = 200;
+	}*/
+	
+	if(!this.ownedByPlayer)
+	{
+		var FACTOR = 3;
+		this.vel.x = this.serverVel.x;
+		this.vel.y = this.serverVel.y;
+		var delta = v2Subtract(this.serverPos, this.pos);
+		this.vel = v2Add(this.vel, v2Multiply(delta, FACTOR));
+		var dif = v2Difference(this.pos, this.serverPos);
+		if(dif > 2)
+		{
+			this.pos = this.serverPos;
+			console.log("DIF TOO BIG: " + dif);
+		}
 	}
 	
 	//shitty volume control
@@ -253,6 +283,33 @@ Train.prototype.update = function(deltaTime)
 	{
 		this.colbool = false;
 	}
+};
+
+// Gets the state object that should be send to the server for this object
+Train.prototype.getNetworkMessage = function ()
+{
+	/*var values = [];
+	
+	values.push({
+		Key: "serverPos",
+		Value: this.pos
+	});
+	values.push({
+		Key: "serverFaceDir",
+		Value: this.faceDir
+	});
+	values.push({
+		Key: "serverTargetTile",
+		Value: this.targetTile
+	});
+	
+	
+	var msg = {
+		entityId: writeNetId(this.netId),
+		values: values
+	};
+	
+	return msg;*/
 };
 
 Train.prototype.render = function()

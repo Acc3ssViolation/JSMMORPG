@@ -11,6 +11,7 @@ namespace Server
         public string IPAddress { get; set; }
         public int Port { get; set; }
         public string Name { get; set; }
+        public string Message { get; set; }
         public int ProcessThreadCount { get; set; }
 
         public Config()
@@ -18,7 +19,8 @@ namespace Server
             IPAddress = "127.0.0.1";
             Port = 9998;
             Name = "Local Server";
-            ProcessThreadCount = 2;
+            Message = "A test server for all sorts of testing. Science!";
+            ProcessThreadCount = 1;
         }
     }
 }

@@ -26,12 +26,13 @@ function Net(webSocketUrl)
 	this.ws.onclose = function()
 	{
 		console.log("Connection is closed..."); 
+		net.onclose();
 	};
 	
 	this.ws.onmessage = function (evt) 
 	{ 
 		var string = evt.data;
-		console.log("Message is received:\n" + string);
+		//console.log("Message is received:\n" + string);
 		try 
 		{
 			var obj = JSON.parse(string);
@@ -51,6 +52,12 @@ function Net(webSocketUrl)
 	
 	// Assign message handling function to this in game.js
 	this.onmessage = function(obj)
+	{
+		
+	};
+	
+	// When closed
+	this.onclose = function()
 	{
 		
 	};

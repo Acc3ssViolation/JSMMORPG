@@ -53,6 +53,8 @@
     <Compile Include="Game\NetworkedEntity.cs" />
     <Compile Include="Game\Player.cs" />
     <Compile Include="Game\SyncedValue.cs" />
+    <Compile Include="Game\Time.cs" />
+    <Compile Include="Game\Train.cs" />
     <Compile Include="Math\Vector2.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="WebSocket\Frame.cs" />

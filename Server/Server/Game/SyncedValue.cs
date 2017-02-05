@@ -59,9 +59,9 @@ namespace Server.Game
             m_dirty = false;
         }
 
-        public void Parse(object value)
+        public void SetDirty()
         {
-
+            m_dirty = true;
         }
     }
 }

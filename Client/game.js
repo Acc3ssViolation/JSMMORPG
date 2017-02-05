@@ -13,7 +13,7 @@ window.onload = gameStart;
 var player = new Player(4, 4);
 entityRegister(player);
 
-var dialogWindow = new DialogWindow(true);
+var dialogWindow = new DialogWindow(false);
 entityRegister(dialogWindow);
 
 var audioMusic = new AudioPlayer('resources/music-01.mp3', AudioType.music, true, 1.0);
@@ -125,7 +125,7 @@ function gameStart()
 	levels[1].entityRegister(new Trashcan(1, 2));
 	levels[0].entityRegister(new Portal(new Vector2(8, 9), 1, new Vector2(3, 2)));
 	levels[1].entityRegister(new Portal(new Vector2(3, 1), 0, new Vector2(8, 8)));
-	levels[0].entityRegister(new Train(20, 5, 0, 0));
+	//levels[0].entityRegister(new Train(20, 5, 0, 0));
 	initFirstLevel();
 	
 	//Test
@@ -157,6 +157,7 @@ function gameStart()
 	intervalId = window.setInterval(gameTick, targetFrameTime);
 	
 	// Networking
+	net.onclose = onNetClosed;
 	if(net.ready === true)
 	{
 		onNetReady();
@@ -166,6 +167,11 @@ function gameStart()
 		console.log(net.ready);
 		net.onopen = onNetReady;
 	}
+}
+
+function onNetClosed()
+{
+	dialogWindow.show("Lost connection to the server...");
 }
 
 function onNetReady()
@@ -183,7 +189,7 @@ function onNetReady()
 
 function handleNetworkMessage(obj)
 {
-	console.log(obj);
+	//console.log(obj);
 	if(obj.type == "game_update")
 	{
 		console.log("Game update!");
@@ -199,6 +205,16 @@ function handleNetworkMessage(obj)
 					var newPlayer = new Player(4, 4);
 					newPlayer.netId = netId;
 					spawnedEntity = newPlayer;
+				}
+				else if(obj.spawns[i].type == "Train")
+				{
+					spawnedEntity = new Train(100, 100, 0, 0);
+					spawnedEntity.netId = netId;
+				}
+				else
+				{
+					console.log("Unknown entity type: " + obj.spawns[i].type);
+					continue;
 				}
 				
 				if(obj.spawns[i].values)
@@ -239,7 +255,26 @@ function handleNetworkMessage(obj)
 					{
 						if(vals[k].Key in updateEntity)
 						{
-							console.log("FOUND " + vals[k].Key + " IN ENTITY ");
+							if(obj.updates[i].entityId != player.netId)
+							{
+								if(vals[k].Key == "level" && updateEntity.level != vals[k].Value)
+								{
+									levels[updateEntity.level].entityRemove(updateEntity);
+									levels[vals[k].Value].entityRegister(updateEntity);
+									if(vals[k].Value != currentLevelIndex)
+									{
+										updateEntity.disable();
+									}
+									else
+									{
+										updateEntity.enable();
+									}
+									
+									console.log("Moved entity from level " + updateEntity.level + " to " + vals[k].Value);
+								}
+							}
+							
+							//console.log("FOUND " + vals[k].Key + " IN ENTITY ");
 							updateEntity[vals[k].Key] = vals[k].Value;
 						}
 						else
@@ -283,6 +318,9 @@ function handleNetworkMessage(obj)
 		player.netId = readNetId(obj.playerEntityId);
 		player.ownedByPlayer = true;
 		net.netcollection.entityRegister(player);
+		
+		var displayMessage = "Welcome to " + obj.serverName + "!\r\n" + obj.serverMessage;
+		dialogWindow.show(displayMessage);
 	}
 }
 

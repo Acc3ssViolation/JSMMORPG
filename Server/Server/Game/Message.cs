@@ -36,6 +36,8 @@ namespace Server.Game
     public class GamePlayerSpawnedMessage : Message
     {
         public int playerEntityId;
+        public string serverName;
+        public string serverMessage;
 
         public GamePlayerSpawnedMessage()
         {
