@@ -1,0 +1,90 @@
+*{
+	box-sizing: border-box;
+	margin: 0px;
+	padding: 0px;
+	font-family: Arial;
+}
+
+h1 {
+	color: #FF0000;
+}
+
+#col {
+	background-color: #FF00FF;
+	max-width: 900px;
+	margin: 0 auto;
+	box-shadow: 0px 10px 52px #888888;
+}
+
+#header {
+	background-color: pink;
+}
+
+#menu {
+}
+
+.backgroundColorAlt {
+	background-color: #333333;
+}
+
+#content {
+	min-height: 350px;
+}
+
+#footer {
+	font-size: 11pt;
+	min-height: 120px;
+}
+
+.backgroundColor {
+	background-color: #EEEEEE;
+}
+
+.fontColor, p, h1, h2, h3, h4, h5, h6, h7 {
+	color: #222222;
+}
+
+.fontColorLink, a {
+	color: blue;
+	text-decoration: none;
+}
+
+a:visited {
+	color: orange;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.fontColorAlt, #menu ul a, #menu ul a:visited, #footer ul a, #footer ul a:visited  {
+	color: #BBBBBB;
+}
+
+.padded {
+	padding: 10px;
+}
+
+.clear {
+	clear: both;
+}
+
+#menu ul, #footer ul {
+	list-style-type: none;
+	height: 40px;
+}
+
+.menuItem {
+	font-weight: bold;
+	padding: 12px;
+	margin: 0 5px;
+
+	height: 100%;
+	float: left;
+}
+
+.menuItem:hover {
+	color: pink;
+
+}
+
