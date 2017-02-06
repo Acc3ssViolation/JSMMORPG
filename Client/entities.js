@@ -18,6 +18,7 @@ function Player(x, y)
 	this.serverPos = tileToWorld(x, y);
 	this.serverFaceDir = 0;
 	this.serverTargetTile = worldToTile(x, y);
+	this.displayName = "PLAYER";
 	
 	//generic things
 	this.pos = tileToWorld(x, y); //new Vector2(x, y);
@@ -49,6 +50,11 @@ Player.prototype.update = function(deltaTime)
 		}
 		this.targetTile = this.serverTargetTile;
 		this.faceDir = this.serverFaceDir;
+	}
+	else
+	{
+		// Force player to current level
+		this.level = currentLevelIndex;
 	}
 	
 	this.currentTile = worldToTile(this.pos.x, this.pos.y);
@@ -88,7 +94,7 @@ Player.prototype.update = function(deltaTime)
 	}
 	
 	//See if the target tile is walkable
-	var tv = getTile(this.targetTile.x, this.targetTile.y);
+	var tv = levels[this.level].getTile(this.targetTile.x, this.targetTile.y);
 	if(!tv.walkable){
 		this.targetTile.x = this.currentTile.x;
 		this.targetTile.y = this.currentTile.y;
@@ -147,6 +153,13 @@ Player.prototype.render = function()
 				
 				//debug
 	drawWorldRectOutline(this.pos.x + this.col.left, this.pos.y + this.col.top, this.col.size.x, this.col.size.y, '#FFFF00');
+	
+	var color = '#FF0000';
+	if(this.ownedByPlayer)
+	{
+		color = '#00FF00';
+	}
+	fillWorldText(this.pos.x - 1, this.pos.y - 1, this.displayName, '12px Arial', color);
 };
 
 Player.prototype.disable = function()
@@ -206,8 +219,6 @@ Player.prototype.teleport = function(newWorldPos)
 	//Reset walking animtion
 	this.moveAnimState = 0;
 	this.moveAnimTimer = 99;
-	
-	this.level = currentLevelIndex;
 };
 
 
@@ -241,25 +252,27 @@ function Train(x, y, vx, vy)
 Train.prototype.update = function(deltaTime)
 {
 	//this.vel.x = -10;
-	this.pos = v2Add(this.pos, v2Multiply(this.vel, deltaTime));
 	/*if(this.pos.x < -60){
 		this.pos.x = 200;
 	}*/
 	
 	if(!this.ownedByPlayer)
 	{
-		var FACTOR = 3;
+		
 		this.vel.x = this.serverVel.x;
 		this.vel.y = this.serverVel.y;
 		var delta = v2Subtract(this.serverPos, this.pos);
-		this.vel = v2Add(this.vel, v2Multiply(delta, FACTOR));
+		this.vel = v2Multiply(this.vel, NET_SPEED_COMP_FACTOR)
 		var dif = v2Difference(this.pos, this.serverPos);
-		if(dif > 2)
+		if(dif > 10)
 		{
 			this.pos = this.serverPos;
-			console.log("DIF TOO BIG: " + dif);
+			//console.log("DIF TOO BIG: " + dif);
 		}
+		//console.log("Train delta: " + delta.x + "," + delta.y);
 	}
+	
+	this.pos = v2Add(this.pos, v2Multiply(this.vel, deltaTime));
 	
 	//shitty volume control
 	var pdistance = v2Difference(this.pos, player.pos);

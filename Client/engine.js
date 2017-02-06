@@ -74,6 +74,7 @@ Net.prototype.sendJSON = function(msg)
 };
 
 var net = new Net("ws://localhost:9998/echo");
+var NET_SPEED_COMP_FACTOR = 0.92;
 
 function NetCollection()
 {
@@ -214,6 +215,22 @@ Level.prototype.entityRemove = function(entity)
 	}
 	return false;
 };
+
+Level.prototype.getTile = function(x, y)
+{
+	x = Math.floor(x);
+	y = Math.floor(y);
+	var val = this.tiles[y * this.tileCountX + x];
+	return val;
+}
+
+Level.prototype.getTileFromWorld = function(x, y)
+{
+	x = Math.floor(x / TILE_SIZE);
+	y = Math.floor(y / TILE_SIZE);
+	var val = this.tiles[y * this.tileCountX + x];
+	return val;
+}
 
 var levels = [];
 
@@ -530,6 +547,16 @@ function drawWorldImage(x, y, width, height, image)
 		width * viewport.pixelsPerUnit, height * viewport.pixelsPerUnit);
 }
 
+function fillWorldText(x, y, text, font, color)
+{
+	x -= viewport.pos.x;
+	y -= viewport.pos.y;
+	renderContext.fillStyle = color;
+	renderContext.font = font;
+	renderContext.fillText(text,
+		Math.round((x * viewport.pixelsPerUnit)), (buffer.height - Math.round((y * viewport.pixelsPerUnit))));
+}
+
 function drawWorldImageSheet(x, y, width, height, image, srcx, srcy, srcw, srch)
 {
 	x -= viewport.pos.x;
@@ -554,22 +581,6 @@ function screenFlip()
 /*
 	Tile functions
 */
-
-function getTile(x, y)
-{
-	x = Math.floor(x);
-	y = Math.floor(y);
-	var val = currentLevel.tiles[y * currentLevel.tileCountX + x];
-	return val;
-}
-
-function getTileFromWorld(x, y)
-{
-	x = Math.floor(x / TILE_SIZE);
-	y = Math.floor(y / TILE_SIZE);
-	var val = currentLevel.tiles[y * currentLevel.tileCountX + x];
-	return val;
-}
 
 function worldToTile(x, y)
 {

@@ -135,7 +135,7 @@ function gameStart()
 	{
 		for(var x = 0; x < currentLevel.tileCountX; x++)
 		{
-			var tile = getTile(x, y);
+			var tile = currentLevel.getTile(x, y);
 			if(tile == TileType.grass)
 			{
 				if(Math.random() > 0.92)
@@ -178,7 +178,7 @@ function onNetReady()
 {
 	var msg = {
 	  type: "con_start",
-	  username: "Henk-" + (Math.random() * 100),
+	  username: "Player nr. " + Math.floor(Math.random() * 100),
 	};
 	net.sendJSON(msg);
 	
@@ -192,7 +192,8 @@ function handleNetworkMessage(obj)
 	//console.log(obj);
 	if(obj.type == "game_update")
 	{
-		console.log("Game update!");
+		//console.log("Game update!");
+		console.log(obj);
 		// Spawns
 		for(var i = 0; i < obj.spawns.length; i++)
 		{
@@ -219,17 +220,34 @@ function handleNetworkMessage(obj)
 				
 				if(obj.spawns[i].values)
 				{
-					var vals = obj.spawned[i].values;
+					var vals = obj.spawns[i].values;
 					for(var k = 0; k < vals.length; k++)
 					{
 						if(vals[k].Key in spawnedEntity)
 						{
-							console.log("FOUND " + vals[k].Key + " IN ENTITY");
+							if(vals[k].Key == "level" && spawnedEntity.level != vals[k].Value)
+							{
+								levels[spawnedEntity.level].entityRemove(spawnedEntity);
+								levels[vals[k].Value].entityRegister(spawnedEntity);
+								if(vals[k].Value != currentLevelIndex)
+								{
+									spawnedEntity.disable();
+								}
+								else
+								{
+									spawnedEntity.enable();
+								}
+								
+								console.log("Moved entity from level " + spawnedEntity.level + " to " + vals[k].Value);
+								console.log(spawnedEntity);
+							}
+							//console.log("FOUND " + vals[k].Key + " IN ENTITY ");
 							spawnedEntity[vals[k].Key] = vals[k].Value;
 						}
 						else
 						{
-							console.log("DID NOT FIND " + vals[k].Key + " IN ENTITY");
+							console.log("DID NOT FIND " + vals[k].Key + " IN ENTITY ");
+							console.log(spawnedEntity);
 						}
 					}
 				}
@@ -244,44 +262,46 @@ function handleNetworkMessage(obj)
 		for(var i = 0; i < obj.updates.length; i++)
 		{
 			var netId = readNetId(obj.updates[i].entityId);
-			if(obj.updates[i].entityId != player.netId || true)
+
+			var updateEntity = net.netcollection.entityFind(netId);
+			if(obj.updates[i].values)
 			{
-				var updateEntity = net.netcollection.entityFind(netId);
-				
-				if(obj.updates[i].values)
+				var vals = obj.updates[i].values;
+				for(var k = 0; k < vals.length; k++)
 				{
-					var vals = obj.updates[i].values;
-					for(var k = 0; k < vals.length; k++)
+					if(vals[k].Key in updateEntity)
 					{
-						if(vals[k].Key in updateEntity)
+						if(netId != player.netId)
 						{
-							if(obj.updates[i].entityId != player.netId)
+							if(vals[k].Key == "level" && updateEntity.level != vals[k].Value)
 							{
-								if(vals[k].Key == "level" && updateEntity.level != vals[k].Value)
+								levels[updateEntity.level].entityRemove(updateEntity);
+								levels[vals[k].Value].entityRegister(updateEntity);
+								if(vals[k].Value != currentLevelIndex)
 								{
-									levels[updateEntity.level].entityRemove(updateEntity);
-									levels[vals[k].Value].entityRegister(updateEntity);
-									if(vals[k].Value != currentLevelIndex)
-									{
-										updateEntity.disable();
-									}
-									else
-									{
-										updateEntity.enable();
-									}
-									
-									console.log("Moved entity from level " + updateEntity.level + " to " + vals[k].Value);
+									updateEntity.disable();
 								}
+								else
+								{
+									updateEntity.enable();
+								}
+								
+								console.log("Moved entity from level " + updateEntity.level + " to " + vals[k].Value);
+								console.log(updateEntity);
 							}
-							
-							//console.log("FOUND " + vals[k].Key + " IN ENTITY ");
-							updateEntity[vals[k].Key] = vals[k].Value;
 						}
 						else
 						{
-							console.log("DID NOT FIND " + vals[k].Key + " IN ENTITY ");
-							console.log(updateEntity);
+							//console.log("Ignoring level attribute for local player...");
 						}
+						
+						//console.log("FOUND " + vals[k].Key + " IN ENTITY ");
+						updateEntity[vals[k].Key] = vals[k].Value;
+					}
+					else
+					{
+						console.log("DID NOT FIND " + vals[k].Key + " IN ENTITY ");
+						console.log(updateEntity);
 					}
 				}
 			}

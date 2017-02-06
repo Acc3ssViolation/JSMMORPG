@@ -51,12 +51,17 @@ namespace Server.Game
 
             GameController.instance.AddUpdate(new UpdateEntry() {
                 entityId = m_entity.id,
-                values = new KeyValuePair<string, object>[] {
+                values = new List<KeyValuePair<string, object>>() {
                     new KeyValuePair<string, object>(m_identifier, m_value)
                 }
             });
 
             m_dirty = false;
+        }
+
+        public KeyValuePair<string, object> GetKVPair()
+        {
+            return new KeyValuePair<string, object>(m_identifier, m_value);
         }
 
         public void SetDirty()

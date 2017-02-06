@@ -56,8 +56,8 @@ namespace Server.Game
             // TEST
             var train = SpawnNetworked<Train>();
             train.serverPos.value = new Vector2(-60, 5.5f);
-            train = SpawnNetworked<Train>();
-            train.serverPos.value = new Vector2(120, 5.5f);
+           // train = SpawnNetworked<Train>();
+            //train.serverPos.value = new Vector2(120, 5.5f);
         }
 
         /// <summary>
@@ -101,13 +101,21 @@ namespace Server.Game
                 {
                     entityId = entity.id,
                     type = entity.GetType().Name,
+                    values = entity.GetAllKVPairs()
                 });
             }
             frame = new Frame();
             frame.SetPayload(JsonConvert.SerializeObject(newClientMessage, Formatting.None));
             frame.Write(newClient.m_tcpClient.GetStream());
 
-            //
+            // Add name message
+            m_sendBuffer.updates.Add(new UpdateEntry
+            {
+                entityId = newPlayer.id,
+                values = newPlayer.GetAllKVPairs()
+            });
+
+
             Output.WriteLine("GC: Connected client " + newClient.m_name);
         }
 

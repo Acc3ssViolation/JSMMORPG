@@ -13,5 +13,12 @@ namespace Server.Game
         public SyncedValue<Vector2> serverPos           = new SyncedValue<Vector2>();
         public SyncedValue<Vector2> serverTargetTile    = new SyncedValue<Vector2>();
         public SyncedValue<int> serverFaceDir           = new SyncedValue<int>();
+
+        public override List<KeyValuePair<string, object>> GetAllKVPairs()
+        {
+            var list = base.GetAllKVPairs();
+            list.Add(new KeyValuePair<string, object>("displayName", owner.m_name));
+            return list;
+        }
     }
 }

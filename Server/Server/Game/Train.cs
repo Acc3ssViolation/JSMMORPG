@@ -19,7 +19,7 @@ namespace Server.Game
 
         public override void Start()
         {
-            serverVel.value = new Vector2(10, 0);
+            serverVel.value = new Vector2(6, 0);
         }
 
         public override void Update()

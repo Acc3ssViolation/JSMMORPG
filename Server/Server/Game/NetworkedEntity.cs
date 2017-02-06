@@ -88,6 +88,16 @@ namespace Server.Game
             }
         }
 
+        public virtual List<KeyValuePair<string, object>> GetAllKVPairs()
+        {
+            var list = new List<KeyValuePair<string, object>>();
+            foreach(var val in m_syncedValues)
+            {
+                list.Add(val.Value.GetKVPair());
+            }
+            return list;
+        }
+
         private bool CustomSetValue(dynamic dynSyncVal, dynamic value)
         {
             Type t = dynSyncVal.GetType().GetGenericArguments()[0];

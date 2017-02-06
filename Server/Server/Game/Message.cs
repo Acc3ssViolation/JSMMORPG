@@ -48,14 +48,14 @@ namespace Server.Game
     public struct UpdateEntry
     {
         public int entityId;
-        public KeyValuePair<string, object>[] values;
+        public List<KeyValuePair<string, object>> values;
     }
 
     public struct SpawnEntry
     {
         public int entityId;
         public string type;
-        public KeyValuePair<string, object>[] values;
+        public List<KeyValuePair<string, object>> values;
     }
 
     public struct RemoveEntry
